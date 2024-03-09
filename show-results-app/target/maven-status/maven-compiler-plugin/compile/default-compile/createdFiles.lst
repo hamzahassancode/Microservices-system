@@ -1,0 +1,5 @@
+com\example\showresultsapp\model\AuthenticationRequest.class
+com\example\showresultsapp\model\AnalyticsResult.class
+com\example\showresultsapp\model\AppConfig.class
+com\example\showresultsapp\ShowResultsAppApplication.class
+com\example\showresultsapp\AnalyticsController.class
