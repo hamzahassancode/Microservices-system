@@ -1,0 +1,66 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: grades_db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./setup.sql:/docker-entrypoint-initdb.d/setup.sql
+
+  data-entry-app:
+    build:
+      context: ./data-entry-app
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3307/grades_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - mysql
+    networks:
+      - my-network
+
+  authentication-service:
+    build:
+      context: ./authentication-service
+    networks:
+      - my-network
+
+  analytics-service:
+    build:
+      context: ./analytics-service
+    depends_on:
+      - mysql
+      - mongo
+    networks:
+      - my-network
+
+  mongo:
+    build:
+      context: ./mongo
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - my-network
+
+  show-results-app:
+    build:
+      context: ./show-results-app
+    ports:
+      - "8082:8080"
+    depends_on:
+      - mongo
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mongo-data:
